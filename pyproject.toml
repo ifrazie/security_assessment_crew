@@ -1,0 +1,21 @@
+[project]
+name = "security_assessment_crew"
+version = "0.1.0"
+description = "security-assessment-crew using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "crewai[tools]>=0.108.0,<1.0.0",
+    "python-nmap>=0.7.1",
+]
+
+[project.scripts]
+kickoff = "security_assessment_crew.main:kickoff"
+plot = "security_assessment_crew.main:plot"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "flow"

@@ -1,0 +1,45 @@
+# Python
+.env
+__pycache__/
+lib/
+.DS_Store
+
+# Security scan outputs
+scan_results.txt
+output/
+nmap_scan.json
+*.log
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Sensitive configuration files
+*.pem
+*.key
+*.crt
+*.cert
+*.env*
+!.env.example
+config.ini
+secrets.yaml
+credentials.json
+
+# Cache and temporary files
+.cache/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Test coverage
+.coverage
+htmlcov/
