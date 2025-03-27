@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from crewai.flow import Flow, listen, start
 from security_assessment_crew.crews.recon_crew.recon_crew import SecurityToolsCrew
 import json
 
-ip_address = '192.168.4.29'
-
 class ScanState(BaseModel):
     ip_address: str = ""
     scan_results: str = ""
-
 
 class SecurityScanFlow(Flow[ScanState]):
     @start()
