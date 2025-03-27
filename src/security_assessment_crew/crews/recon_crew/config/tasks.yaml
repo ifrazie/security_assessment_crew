@@ -6,7 +6,6 @@ scan_ip_task:
     Results of an Nmap scan of {ip_address} to determine open ports and 
     services in JSON format.
   agent: cybersecurity_analyst
-  output_file: output/nmap_scan.json
 
 create_report_task:
   description: >
@@ -17,4 +16,3 @@ create_report_task:
   agent: technical_analyst
   context: 
     - scan_ip_task
-  output_file: output/security_report.md
