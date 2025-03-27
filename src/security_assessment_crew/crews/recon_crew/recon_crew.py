@@ -26,15 +26,30 @@ class SecurityToolsCrew():
             verbose=True,
             tools=[ScanNetworkTool(result_as_answer=True)] # Example of adding a tool to the agent
         )
+    
+    @agent
+    def technical_analyst(self) -> Agent:
+        return Agent(
+            config=self.agents_config['technical_analyst'],
+            verbose=True,
+        )
 
     # To learn more about structured task outputs,
     # task dependencies, and task callbacks, check out the documentation:
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
     @task
-    def info_task(self) -> Task:
+    def scan_ip_task(self) -> Task:
         return Task(
-            config=self.tasks_config['info_task'],
+            config=self.tasks_config['scan_ip_task'],
             output_file='output/nmap_scan.json', # Optional: specify an output file for the task results
+        )
+    
+    @task
+    def create_report_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['create_report_task'],
+            context=[self.scan_ip_task()],
+            output_file='output/security_report.md'
         )
 
     @crew
