@@ -127,11 +127,20 @@ def kickoff():
 
 def plot():
     """Print a viz of the flow"""
+    from pathlib import Path
+    
+    # Ensure output directory exists
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    
+    # Generate plot
     flow = SecurityScanFlow()
-    flow.plot("sec_flow")
+    plot_path = output_dir / "security_flow"
+    flow.plot(str(plot_path))
+    
     print("\n*** Flow Plot Generated ***\n")
-    print("Results saved")
-    print("Flow visualization saved to sec_flow.html")
+    print(f"Flow visualization saved to {plot_path}")
 
 if __name__ == "__main__":
+    # Run scan flow
     kickoff()
