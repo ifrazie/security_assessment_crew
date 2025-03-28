@@ -15,6 +15,9 @@ nmap_scan.json
 venv/
 ENV/
 
+# Synk profile info
+.dccache
+
 # IDE specific files
 .idea/
 .vscode/

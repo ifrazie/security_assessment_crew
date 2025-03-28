@@ -5,7 +5,6 @@ from crewai.flow import Flow, listen, start
 from security_assessment_crew.crews.recon_crew.recon_crew import SecurityToolsCrew
 from security_assessment_crew.utils.report_formatter import SecurityReportFormatter
 from security_assessment_crew.models import PortInfo, ScanOverview, Recommendation, ReportOutline
-import json
 
 class ScanState(BaseModel):
     ip_address: str = ""
