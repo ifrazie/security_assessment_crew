@@ -5,6 +5,9 @@ from crewai.flow import Flow, listen, start
 from security_assessment_crew.crews.recon_crew.recon_crew import SecurityToolsCrew
 from security_assessment_crew.utils.report_formatter import SecurityReportFormatter
 from security_assessment_crew.models import PortInfo, ScanOverview, Recommendation, ReportOutline
+from datetime import datetime
+import json
+from pathlib import Path
 
 class ScanState(BaseModel):
     ip_address: str = ""
@@ -24,14 +27,31 @@ class SecurityScanFlow(Flow[ScanState]):
     def perform_scan(self):
         """Perform a port scan on the target ip_address"""
         print(f"Scanning : {self.state.ip_address} for open ports")
+        
+        # Ensure output directory exists
+        output_dir = Path("output")
+        output_dir.mkdir(exist_ok=True)
+        
         scan_result = (
             SecurityToolsCrew()
             .crew()
             .kickoff(inputs={"ip_address": self.state.ip_address})
         )
         
-        # Parse scan results to extract port information
+        # Store raw scan results
         self.state.scan_results = scan_result.raw
+        
+        # Save scan results to JSON
+        scan_data = {
+            "timestamp": str(datetime.now()),
+            "target": self.state.ip_address,
+            "raw_results": self.state.scan_results
+        }
+        
+        with open(output_dir / "nmap_scan.json", "w") as f:
+            json.dump(scan_data, f, indent=2)
+            
+        print("Port scan completed and results saved")
         
         # Parse ports from scan results
         port_findings = self._parse_scan_results(self.state.scan_results)

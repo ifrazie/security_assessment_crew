@@ -1,7 +1,11 @@
 scan_ip_task:
   description: >
-    Conduct a port scan of {ip_address}
-    Make sure you find any interesting and relevant information given.
+    Conduct a port scan of {ip_address}.
+    Find any interesting and relevant information about open ports and services.
+    Output the results in a structured format that includes:
+    - Open ports and their states
+    - Services running on those ports
+    - Risk levels for each finding
   expected_output: >
     Results of an Nmap scan of {ip_address} to determine open ports and 
     services in JSON format.
@@ -9,10 +13,17 @@ scan_ip_task:
 
 create_report_task:
   description: >
-    Write a report on the security posture of {ip_address}
-    Make sure you include all relevant information in Markdown format.
+    Create a comprehensive security assessment report for {ip_address}.
+    Include the following sections:
+    - Scan Overview
+    - Open Ports and Services
+    - Risk Assessment
+    - Security Recommendations
+    - Conclusion
+    
+    Use the scan results to identify security risks and make appropriate recommendations.
   expected_output: >
-    A detailed report on the security posture of {ip_address}.
+    A detailed security assessment report in Markdown format.
   agent: technical_analyst
   context: 
     - scan_ip_task
