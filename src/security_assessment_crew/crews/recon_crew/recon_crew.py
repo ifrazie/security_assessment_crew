@@ -20,6 +20,8 @@ class SecurityToolsCrew():
     tasks_config = 'config/tasks.yaml'
 
     def _load_yaml(self, path):
+        if not isinstance(path, str):
+            raise TypeError(f"_load_yaml expects a string path, got {type(path).__name__}")
         with open(os.path.join(os.path.dirname(__file__), path), 'r') as f:
             return yaml.safe_load(f)
 
@@ -27,7 +29,7 @@ class SecurityToolsCrew():
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
     def cybersecurity_analyst(self) -> Agent:
-        agents = self._load_yaml(self.agents_config)
+        agents = self._load_yaml(SecurityToolsCrew.agents_config)
         cfg = agents['cybersecurity_analyst']
         return Agent(
             role=cfg['role'],
@@ -40,7 +42,7 @@ class SecurityToolsCrew():
     
     @agent
     def technical_analyst(self) -> Agent:
-        agents = self._load_yaml(self.agents_config)
+        agents = self._load_yaml(SecurityToolsCrew.agents_config)
         cfg = agents['technical_analyst']
         return Agent(
             role=cfg['role'],
@@ -55,22 +57,22 @@ class SecurityToolsCrew():
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
     @task
     def scan_ip_task(self) -> Task:
-        tasks = self._load_yaml(self.tasks_config)
+        tasks = self._load_yaml(SecurityToolsCrew.tasks_config)
         cfg = tasks['scan_ip_task']
         return Task(
             description=cfg['description'],
             expected_output=cfg['expected_output'],
-            agent=cfg['agent']
+            agent=self.cybersecurity_analyst()
         )
 
     @task
     def create_report_task(self) -> Task:
-        tasks = self._load_yaml(self.tasks_config)
+        tasks = self._load_yaml(SecurityToolsCrew.tasks_config)
         cfg = tasks['create_report_task']
         return Task(
             description=cfg['description'],
             expected_output=cfg['expected_output'],
-            agent=cfg['agent'],
+            agent=self.technical_analyst(),
             context=[self.scan_ip_task()]
         )
 
