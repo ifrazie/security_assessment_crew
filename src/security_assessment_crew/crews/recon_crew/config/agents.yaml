@@ -19,7 +19,7 @@ cybersecurity_analyst:
     anticipate their moves. You have the information you need to understand how 
     attackers scan, exploit, pivot, and establish persistence in cloud and 
     conventional systems.
-  llm: ollama/granite3.1-dense:8b
+  llm: ollama/granite3.2-gideon:latest
 
 technical_analyst:
   role: >
@@ -42,5 +42,5 @@ technical_analyst:
     anticipate their moves. You have the information you need to understand how 
     attackers scan, exploit, pivot, and establish persistence in cloud and 
     conventional systems.
-  llm: ollama/granite3.1-dense:8b
+  llm: ollama/granite3.2-gideon:latest
 

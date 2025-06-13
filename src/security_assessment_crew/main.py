@@ -1,18 +1,17 @@
 #!/usr/bin/env python
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from crewai.flow import Flow, listen, start
 from security_assessment_crew.crews.recon_crew.recon_crew import SecurityToolsCrew
-from security_assessment_crew.utils.report_formatter import SecurityReportFormatter
 from security_assessment_crew.models import PortInfo, ScanOverview, Recommendation, ReportOutline
 from datetime import datetime
-import json
 from pathlib import Path
+import json
 
 class ScanState(BaseModel):
     ip_address: str = ""
     scan_results: str = ""
-    report: ReportOutline = None
+    report: Optional[ReportOutline] = None
 
 class SecurityScanFlow(Flow[ScanState]):
     @start()
@@ -86,11 +85,6 @@ class SecurityScanFlow(Flow[ScanState]):
             conclusion="The security posture presents a mix of low, medium, and high risks. The most critical finding is the open SMB port (Port 445), which poses a high risk due to potential unauthorized access and data exfiltration. Addressing this vulnerability should be prioritized."
         )
         
-        # Save formatted report
-        report_content = SecurityReportFormatter.format_report(self.state.report)
-        with open("output/security_report.md", "w", encoding='utf-8') as file:
-            file.write(report_content)
-        
         print("Port scan completed and report generated")
 
     def _parse_scan_results(self, scan_results: str) -> List[PortInfo]:
@@ -114,19 +108,27 @@ class SecurityScanFlow(Flow[ScanState]):
         print(f"Creating report for {self.state.ip_address}")
         
         try:
+            # Safely handle None for self.state.report
+            if self.state.report is not None:
+                if hasattr(self.state.report, "model_dump"):
+                    report_data = self.state.report.model_dump()
+                else:
+                    report_data = self.state.report.__dict__
+            else:
+                report_data = None
             result = (
                 SecurityToolsCrew()
                 .crew()
                 .kickoff(inputs={
                     "ip_address": self.state.ip_address,
                     "scan_results": self.state.scan_results,
-                    "report": self.state.report.model_dump()
+                    "report": report_data
                 })
             )
             
             # Save the report with UTF-8 encoding
             with open("output/security_report.md", "w", encoding='utf-8') as file:
-                file.write(result.raw if hasattr(result, 'raw') else result)
+                file.write(result.raw if hasattr(result, 'raw') else str(result))
             
             print("Report created successfully")
             

@@ -2,6 +2,8 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
 from security_assessment_crew.tools.scan_network import ScanNetworkTool
+import yaml
+import os
 
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -17,20 +19,34 @@ class SecurityToolsCrew():
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
+    def _load_yaml(self, path):
+        with open(os.path.join(os.path.dirname(__file__), path), 'r') as f:
+            return yaml.safe_load(f)
+
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
     def cybersecurity_analyst(self) -> Agent:
+        agents = self._load_yaml(self.agents_config)
+        cfg = agents['cybersecurity_analyst']
         return Agent(
-            config=self.agents_config['cybersecurity_analyst'],
+            role=cfg['role'],
+            goal=cfg['goal'],
+            backstory=cfg['backstory'],
+            llm=cfg.get('llm'),
             verbose=True,
             tools=[ScanNetworkTool(result_as_answer=True)] # Example of adding a tool to the agent
         )
     
     @agent
     def technical_analyst(self) -> Agent:
+        agents = self._load_yaml(self.agents_config)
+        cfg = agents['technical_analyst']
         return Agent(
-            config=self.agents_config['technical_analyst'],
+            role=cfg['role'],
+            goal=cfg['goal'],
+            backstory=cfg['backstory'],
+            llm=cfg.get('llm'),
             verbose=True,
         )
 
@@ -39,29 +55,32 @@ class SecurityToolsCrew():
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
     @task
     def scan_ip_task(self) -> Task:
+        tasks = self._load_yaml(self.tasks_config)
+        cfg = tasks['scan_ip_task']
         return Task(
-            config=self.tasks_config['scan_ip_task'],
-            output_file='output/nmap_scan.json', # Optional: specify an output file for the task results
+            description=cfg['description'],
+            expected_output=cfg['expected_output'],
+            agent=cfg['agent']
         )
-    
+
     @task
     def create_report_task(self) -> Task:
+        tasks = self._load_yaml(self.tasks_config)
+        cfg = tasks['create_report_task']
         return Task(
-            config=self.tasks_config['create_report_task'],
-            context=[self.scan_ip_task()],
-            output_file='output/security_report.md'
+            description=cfg['description'],
+            expected_output=cfg['expected_output'],
+            agent=cfg['agent'],
+            context=[self.scan_ip_task()]
         )
 
     @crew
     def crew(self) -> Crew:
         """Creates the Security crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
         return Crew(
             name='SecurityToolsCrew',
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=[self.cybersecurity_analyst(), self.technical_analyst()],
+            tasks=[self.scan_ip_task(), self.create_report_task()],
             process=Process.sequential,
             verbose=True,
             # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
