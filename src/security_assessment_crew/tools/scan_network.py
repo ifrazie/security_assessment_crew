@@ -47,7 +47,6 @@ class ScanNetworkTool(BaseTool):
                             "state": port_info["state"],
                             "service": port_info.get("name", "unknown"),
                             "version": port_info.get("version", "unknown"),
-                            "risk_level": "High" if port in [21, 23, 445, 3389] else "Low"
                         })
             
             # Convert results to formatted string

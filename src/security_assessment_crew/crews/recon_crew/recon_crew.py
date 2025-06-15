@@ -1,5 +1,6 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from crewai.knowledge.source.pdf_knowledge_source import PDFKnowledgeSource
 
 from security_assessment_crew.tools.scan_network import ScanNetworkTool
 import yaml
@@ -85,5 +86,4 @@ class SecurityToolsCrew():
             tasks=[self.scan_ip_task(), self.create_report_task()],
             process=Process.sequential,
             verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
